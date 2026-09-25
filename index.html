@@ -286,7 +286,7 @@ const DRINKS=[
  {id:'d7',e:'💧',n:'San Pellegrino Water',d:'500ml',p:1.8,k:0,pr:0},{id:'d8',img:'1600271886742-f049cd451bba',e:'🍊',n:'Fresh Orange Juice',d:'Sicilian · 330ml',p:3.9,k:140,pr:2}
 ];
 const GOALS={perf:'Performance',cut:'Weight loss',bulk:'Muscle gain',maint:'Maintenance'};
-function suggest(sex,w,goal){const bmr=10*w+6.25*(sex==='f'?165:178)-5*28+(sex==='f'?-161:5),tdee=bmr*1.65;
+function suggest(sex,w,goal,h){const bmr=10*w+6.25*(h||(sex==='f'?165:178))-5*28+(sex==='f'?-161:5),tdee=bmr*1.65;
  return{kcal:Math.round((tdee*{perf:1.1,cut:.8,bulk:1.15,maint:1}[goal])/50)*50,prot:Math.round(w*{perf:1.8,cut:2.2,bulk:2,maint:1.6}[goal])}}
 const IMG=u=>`https://images.unsplash.com/photo-${u}?w=700&q=70&auto=format&fit=crop`;
 const pic=u=>u?`<img src="${IMG(u)}" alt="" loading="lazy" onerror="this.remove()">`:'';
@@ -350,8 +350,8 @@ function render(){
  $('#locTxt').textContent=loc?loc.n:'Choose an address';const [a,b]=eta();$('#eta').textContent=`${a}–${b} min`;
  const kc=cart.reduce((s,c)=>s+c.k*c.q,0),prot=cart.reduce((s,c)=>s+c.pr*c.q,0);
  $('#stats').innerHTML=`<div class="stat"><small>Goal</small><b>${GOALS[me.goal]}</b></div><div class="stat"><small>Cart kcal</small><b>${kc} / ${me.kcal}</b></div><div class="stat"><small>Cart protein</small><b>${prot} g <span style="font-size:12px;opacity:.8">/ ${me.prot} g</span></b></div>`;
- const cats=['For you','Meal plan','My recipes','Bowls','Salads','Pasta','Vegan','Breakfast','Drinks'];
- $('#chips').innerHTML=`<button class="chip plus" data-new="1">＋ New recipe</button>`+cats.map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c==='Meal plan'?'📅 ':''}${c}${c==='My recipes'&&recipes.length?` (${recipes.length})`:''}</button>`).join('');
+ const cats=['For you','Meal plan','My recipes','My orders','Bowls','Salads','Pasta','Vegan','Breakfast','Drinks'];
+ $('#chips').innerHTML=`<button class="chip plus" data-new="1">＋ New recipe</button>`+cats.map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c==='Meal plan'?'📅 ':''}${c}${c==='My recipes'&&recipes.length?` (${recipes.length})`:''}${c==='My orders'&&orders.length?` (${orders.length})`:''}</button>`).join('');
  $('#chips').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{if(b.dataset.new)return openBuilder();cat=b.dataset.c;render()});
  const mealCard=m=>{const s=mealStats(m.ing);return`<button class="card" onclick="openMeal('${m.id}')"><div class="img">${m.e}${pic(m.img)}</div><div class="body"><div class="tags">${m.mine?'<span class="tag g">★ My recipe</span>':m.goal.includes(me.goal)?'<span class="tag g">✓ Fits your goal</span>':''}<span class="tag">${m.cat}</span></div><h3>${esc(m.n)}</h3><p class="muted" style="font-size:13px">${esc(m.d)}</p><div class="row" style="margin-top:auto"><div class="macros"><span><b>${s.k}</b> kcal</span><span><b>${s.pr}g</b> protein</span></div><span class="price">from €10</span></div></div></button>`};
  const drinkCard=d=>`<button class="card" onclick="addDrink('${d.id}')"><div class="img" style="height:120px;font-size:48px">${d.e}${pic(d.img)}</div><div class="body"><h3>${d.n}</h3><p class="muted" style="font-size:13px">${d.d}</p><div class="row" style="margin-top:auto"><div class="macros"><span><b>${d.k}</b> kcal</span><span><b>${d.pr}g</b> protein</span></div><span class="price">${eur(d.p)} <span class="tog add" style="display:inline-grid;place-items:center;margin-left:6px">+</span></span></div></div></button>`;
@@ -365,9 +365,10 @@ function render(){
   html+=`<h2>🥤 Drinks</h2><div class="grid">${DRINKS.map(drinkCard).join('')}</div>`;
  }else if(cat==='My recipes')html+=mine;
  else if(cat==='Meal plan')html+=renderPlan();
+ else if(cat==='My orders');
  else if(cat==='Drinks')html+=`<h2>🥤 Drinks</h2><div class="grid">${DRINKS.map(drinkCard).join('')}</div>`;
  else html+=`<h2>${cat}</h2><div class="grid">${MEALS.filter(m=>m.cat===cat).map(mealCard).join('')}</div>`;
- if(orders.length)html+=`<h2>🧾 My orders</h2><div class="grid">${orders.slice().reverse().map(o=>`<button class="card" onclick="track('${o.id}')"><div class="body"><div class="row"><b>#${o.id}</b><span class="tag ${Date.now()<o.arrive?'g':''}">${Date.now()<o.arrive?'On its way':'Delivered'}</span></div><small class="muted">${new Date(o.at).toLocaleString('en-GB')} · ${o.items.length} item(s)</small><div class="row"><span class="muted" style="font-size:13px">${esc(o.addr)}</span><b>${eur(o.total)}</b></div></div></button>`).join('')}</div>`;
+ if(cat==='My orders')html+=!orders.length?`<h2>🧾 My orders</h2><p class="muted">No orders yet — your first one is a tap away 🥗</p>`:`<h2>🧾 My orders</h2><div class="grid">${orders.slice().reverse().map(o=>`<button class="card" onclick="track('${o.id}')"><div class="body"><div class="row"><b>#${o.id}</b><span class="tag ${Date.now()<o.arrive?'g':''}">${Date.now()<o.arrive?'On its way':'Delivered'}</span></div><small class="muted">${new Date(o.at).toLocaleString('en-GB')} · ${o.items.length} item(s)</small><div class="row"><span class="muted" style="font-size:13px">${esc(o.addr)}</span><b>${eur(o.total)}</b></div></div></button>`).join('')}</div>`;
  $('#menu').innerHTML=html;
  const n=cart.reduce((s,c)=>s+c.q,0),t=cart.reduce((s,c)=>s+c.p*c.q,0);
  $('#cartTot').textContent=eur(t);$('#cartN').textContent=n;$('#cartN').classList.toggle('hidden',!n);
@@ -640,16 +641,28 @@ function openProfile(){
  const max=Math.max(me.kcal,...days.map(d=>d.k)),bar=(v,t)=>`<div class="pbar"><i class="${v>t?'over':''}" style="width:${Math.min(100,v/t*100)}%"></i></div>`,avg=Math.round(days.slice(1).reduce((s,d)=>s+d.k,0)/6);
  modal(`<div class="mbody"><div class="row"><div class="row" style="justify-content:flex-start"><span class="avatar" style="width:48px;height:48px;font-size:20px">${esc(me.name[0].toUpperCase())}</span><div><h2 style="margin:0">${esc(me.name)}</h2><small class="muted">${esc(me.email)} · ${esc(me.sport)}</small></div></div><button class="tog" onclick="closeM()">✕</button></div>
  <b>🎯 My targets</b>
- <div class="kv"><label class="f">Sex<select id="pSex"><option value="m" ${me.sex==='m'?'selected':''}>Male</option><option value="f" ${me.sex==='f'?'selected':''}>Female</option></select></label><label class="f">Weight (kg)<input id="pW" type="number" value="${me.weight}"></label></div>
+ <div class="kv"><label class="f">Sex<select id="pSex"><option value="m" ${me.sex==='m'?'selected':''}>Male</option><option value="f" ${me.sex==='f'?'selected':''}>Female</option></select></label><label class="f">Height (cm)<input id="pH" type="number" value="${me.height||(me.sex==='f'?165:178)}" oninput="updBMI()"></label></div>
+ <div class="kv"><label class="f">Current weight (kg)<input id="pW" type="number" step="0.1" value="${me.weight}" oninput="updBMI()"></label><label class="f">Target weight (kg)<input id="pTW" type="number" step="0.1" value="${me.targetW||me.weight}" oninput="updBMI()"></label></div>
+ <div class="citem" id="bmiBox"></div>
  <label class="f">Goal<select id="pGoal">${Object.entries(GOALS).map(([k,v])=>`<option value="${k}" ${me.goal===k?'selected':''}>${v}</option>`).join('')}</select></label>
  <div class="kv"><label class="f">Calories / day<input id="pK" type="number" value="${me.kcal}"></label><label class="f">Protein / day (g)<input id="pP" type="number" value="${me.prot}"></label></div>
- <div class="kv"><button class="btn ghost" onclick="const g=suggest($('#pSex').value,+$('#pW').value,$('#pGoal').value);$('#pK').value=g.kcal;$('#pP').value=g.prot">✨ Suggest</button><button class="btn" onclick="saveProfile()">Save</button></div>
+ <div class="kv"><button class="btn ghost" onclick="const g=suggest($('#pSex').value,+$('#pW').value,$('#pGoal').value,+$('#pH').value);$('#pK').value=g.kcal;$('#pP').value=g.prot">✨ Suggest</button><button class="btn" onclick="saveProfile()">Save</button></div>
  <b>📊 Last 7 days</b> <small class="muted" style="margin-top:-10px">Average ${avg} kcal/day · target ${me.kcal}</small>
  <div class="week">${days.slice().reverse().map(d=>`<div><small>${d.k||''}</small><i style="height:${d.k/max*100}%;${d.k>me.kcal?'background:#f59e0b':''}"></i>${d.short}</div>`).join('')}</div>
  ${days.map(d=>`<div class="day"><div class="row"><b>${d.label}</b><small class="muted">${d.k} / ${me.kcal} kcal · ${d.pr} / ${me.prot} g prot</small></div>${bar(d.k,me.kcal)}${bar(d.pr,me.prot)}
   ${d.meals.length?d.meals.map(m=>`<div class="meal-row"><span>${new Date(m.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · ${m.e} ${m.q>1?m.q+'× ':''}${esc(m.n)}</span><span>${m.k*m.q} kcal · ${m.pr*m.q}g</span></div>`).join(''):'<small class="muted">No meals ordered</small>'}</div>`).join('')}
- <button class="btn ghost block" onclick="logout()" style="color:var(--red)">Log out</button></div>`)}
-function saveProfile(){me.sex=$('#pSex').value;me.weight=+$('#pW').value||me.weight;me.goal=$('#pGoal').value;me.kcal=+$('#pK').value||me.kcal;me.prot=+$('#pP').value||me.prot;save();render();openProfile();toast('Profile saved ✓')}
+ <button class="btn ghost block" onclick="logout()" style="color:var(--red)">Log out</button></div>`);updBMI()}
+function bmiOf(w,h){return h?w/((h/100)**2):0}
+function bmiCat(b){return b<18.5?['Underweight','#f59e0b']:b<25?['Healthy','#16a34a']:b<30?['Overweight','#f59e0b']:['Obese','#e5484d']}
+function updBMI(){const h=+$('#pH').value,w=+$('#pW').value,tw=+$('#pTW').value;if(!h||!w)return $('#bmiBox').innerHTML='<small>Enter height & weight to compute your BMI</small>';
+ const b=bmiOf(w,h),tb=bmiOf(tw||w,h),[c,col]=bmiCat(b),[tc]=bmiCat(tb),pos=v=>Math.max(0,Math.min(100,(v-15)/(40-15)*100)),diff=(tw||w)-w;
+ $('#bmiBox').innerHTML=`<div class="row"><div><small>Your BMI</small><div style="font-size:30px;font-weight:800;color:${col};line-height:1.1">${b.toFixed(1)}</div><b style="color:${col};font-size:13px">${c}</b></div>
+ <div style="text-align:right"><small>Target BMI</small><div style="font-size:22px;font-weight:800">${tb.toFixed(1)}</div><small>${tc} · ${Math.abs(diff)<.05?'at target 🎯':(diff<0?'−':'+')+Math.abs(diff).toFixed(1)+' kg to go'}</small></div></div>
+ <div style="position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,#f59e0b 0 14%,#16a34a 14% 40%,#f59e0b 40% 60%,#e5484d 60%);margin:8px 0 2px">
+ <span style="position:absolute;left:calc(${pos(tb)}% - 6px);top:-3px;width:12px;height:16px;border-radius:4px;border:2px dashed var(--txt);background:#fff9"></span>
+ <span style="position:absolute;left:calc(${pos(b)}% - 8px);top:-4px;width:16px;height:18px;border-radius:5px;background:var(--txt);border:2px solid #fff"></span></div>
+ <div style="position:relative;height:14px;font-size:10px;color:var(--mut)">${[15,18.5,25,30,40].map(v=>`<span style="position:absolute;left:${pos(v)}%;transform:translateX(-${pos(v)}%)">${v}</span>`).join('')}</div>`}
+function saveProfile(){me.height=+$('#pH').value||me.height;me.targetW=+$('#pTW').value||me.targetW;me.sex=$('#pSex').value;me.weight=+$('#pW').value||me.weight;me.goal=$('#pGoal').value;me.kcal=+$('#pK').value||me.kcal;me.prot=+$('#pP').value||me.prot;save();render();openProfile();toast('Profile saved ✓')}
 
 // ---------- UI UTILS ----------
 function modal(h){if(tmap){try{tmap.remove()}catch{}tmap=null}$('#modal').innerHTML=h;$('#ov').classList.remove('hidden')}
