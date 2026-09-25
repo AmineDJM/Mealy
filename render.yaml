@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: mealy
+    name: mealprepper
     runtime: static
     buildCommand: ""
     staticPublishPath: .
