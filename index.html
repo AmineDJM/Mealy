@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mealy · Milano</title>
+<meta name="description" content="Dark kitchen à Milan : repas healthy personnalisés pour sportifs, livrés chez vous.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0f0e;--card:#171a19;--card2:#1f2321;--line:#2a2f2c;--txt:#f2f5f3;--mut:#9aa39e;--acc:#3ee07a;--acc2:#2bb862;--warn:#ffb547;--red:#ff5a5a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+button{font:inherit;cursor:pointer;border:0;color:inherit;background:none}
+input,select{font:inherit;color:var(--txt);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;outline:none}
+input:focus,select:focus{border-color:var(--acc)}
+.hidden{display:none!important}
+.btn{background:var(--acc);color:#07170d;font-weight:700;padding:13px 18px;border-radius:12px;transition:.15s}
+.btn:hover{background:var(--acc2)}
+.btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+.btn.block{width:100%}
+.muted{color:var(--mut)}
+/* auth */
+#auth{min-height:100vh;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at 20% 10%,#1d3a27 0,transparent 45%),var(--bg)}
+.auth-box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px}
+.logo{font-weight:800;font-size:28px;letter-spacing:-.5px}.logo span{color:var(--acc)}
+.auth-box form{display:grid;gap:12px;margin-top:20px}
+.tabs{display:flex;gap:6px;background:var(--card2);padding:4px;border-radius:12px;margin-top:18px}
+.tabs button{flex:1;padding:9px;border-radius:9px;font-weight:600;color:var(--mut)}
+.tabs button.on{background:var(--bg);color:var(--txt)}
+/* header */
+header{position:sticky;top:0;z-index:20;background:rgba(13,15,14,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hwrap{max-width:1200px;margin:auto;display:flex;align-items:center;gap:14px;padding:12px 16px}
+.loc{flex:1;display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:8px 14px;min-width:0;cursor:pointer}
+.loc .dot{width:10px;height:10px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px rgba(62,224,122,.2);flex:none}
+.loc div{min-width:0}.loc small{display:block;color:var(--mut);font-size:11px}
+.loc b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.cartbtn{position:relative;background:var(--acc);color:#07170d;font-weight:700;padding:10px 16px;border-radius:999px;white-space:nowrap}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--txt);color:#000;font-size:11px;border-radius:999px;padding:2px 6px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:grid;place-items:center;font-weight:700;flex:none}
+main{max-width:1200px;margin:auto;padding:20px 16px 80px}
+.hero{background:linear-gradient(120deg,#123321,#0f1a14);border:1px solid #1f4a30;border-radius:20px;padding:22px;display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:center}
+.hero h1{font-size:26px;letter-spacing:-.5px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:rgba(0,0,0,.25);border-radius:12px;padding:10px 14px}
+.stat b{font-size:18px;display:block}.stat small{color:var(--mut)}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:22px 0 14px;padding-bottom:4px}
+.chip{padding:9px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);white-space:nowrap;font-weight:600;font-size:14px}
+.chip.on{background:var(--txt);color:#000}
+h2{font-size:20px;margin:26px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:.15s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-2px);border-color:#3a423d}
+.card .img{height:130px;display:grid;place-items:center;font-size:62px}
+.card .body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:16px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--card2);color:var(--mut)}
+.tag.g{color:var(--acc);background:rgba(62,224,122,.1)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.price{font-weight:700}
+.macros{display:flex;gap:10px;font-size:12px;color:var(--mut)}
+.macros b{color:var(--txt)}
+/* modal & drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.overlay{align-items:center}}
+.modal{background:var(--card);border:1px solid var(--line);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0}
+@media(min-width:700px){.modal{border-radius:20px}}
+.modal .img{height:170px;font-size:90px;display:grid;place-items:center;position:relative}
+.close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);font-size:18px}
+.mbody{padding:18px;display:grid;gap:14px}
+.ing{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--card2);border-radius:12px;gap:10px}
+.ing.off{opacity:.45}.ing.off span.n{text-decoration:line-through}
+.ing small{color:var(--mut)}
+.tog{width:30px;height:30px;border-radius:50%;background:var(--bg);border:1px solid var(--line);font-weight:700;flex:none}
+.tog.add{background:var(--acc);color:#000;border:0}
+.qty{display:flex;align-items:center;gap:12px;background:var(--card2);border-radius:12px;padding:6px}
+.qty button{width:32px;height:32px;border-radius:9px;background:var(--bg);font-size:18px}
+.sticky{position:sticky;bottom:0;background:var(--card);padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:12px}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:420px;background:var(--card);z-index:60;border-left:1px solid var(--line);display:flex;flex-direction:column;transform:translateX(100%);transition:.25s}
+.drawer.open{transform:none}
+.dhead{padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.dbody{flex:1;overflow:auto;padding:16px;display:grid;gap:10px;align-content:start}
+.citem{background:var(--card2);border-radius:14px;padding:12px;display:grid;gap:6px}
+.citem small{color:var(--mut)}
+.dfoot{padding:16px;border-top:1px solid var(--line);display:grid;gap:8px}
+.sum{display:flex;justify-content:space-between;font-size:14px}.sum.t{font-size:17px;font-weight:800}
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.payopt{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);text-align:left;font-weight:600;font-size:14px}
+.payopt.on{border-color:var(--acc);background:rgba(62,224,122,.08)}
+.steps{display:grid;gap:14px;margin:6px 0}
+.step{display:flex;gap:12px;align-items:center;color:var(--mut)}
+.step .c{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;flex:none}
+.step.done{color:var(--txt)}.step.done .c{background:var(--acc);border-color:var(--acc);color:#000}
+.step.now .c{border-color:var(--acc);animation:p 1s infinite}
+@keyframes p{50%{box-shadow:0 0 0 6px rgba(62,224,122,.25)}}
+.bar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc);transition:width 1s}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--txt);color:#000;padding:12px 18px;border-radius:12px;font-weight:600;z-index:99;transition:.3s}
+.sugg{display:grid;gap:6px;max-height:240px;overflow:auto}
+.sugg button{text-align:left;padding:10px 12px;border-radius:10px;background:var(--card2)}
+.sugg button:hover{background:#2a302c}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.hwrap .hide-s{display:none}.hero h1{font-size:21px}}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<section id="auth">
+  <div class="auth-box">
+    <div class="logo">Meal<span>y</span> 🥗</div>
+    <p class="muted" style="margin-top:6px">Dark kitchen à Milan · Repas sur-mesure pour sportifs, livrés en 25 min.</p>
+    <div class="tabs"><button class="on" data-t="login">Connexion</button><button data-t="signup">Créer un compte</button></div>
+    <form id="authForm">
+      <input id="aName" placeholder="Prénom" class="hidden">
+      <input id="aEmail" type="email" placeholder="Email" required>
+      <input id="aPass" type="password" placeholder="Mot de passe" required minlength="4">
+      <div id="signupExtra" class="hidden" style="display:grid;gap:12px">
+        <select id="aSport"><option>Musculation</option><option>Running</option><option>Football</option><option>Cyclisme</option><option>CrossFit</option><option>Tennis</option><option>Natation</option></select>
+        <select id="aGoal"><option value="bulk">Prise de masse</option><option value="cut">Sèche</option><option value="perf">Performance / Endurance</option><option value="maint">Maintien</option></select>
+        <div class="kv"><input id="aWeight" type="number" placeholder="Poids (kg)" min="30" max="200"><input id="aKcal" type="number" placeholder="Objectif kcal/j" min="1000" max="6000"></div>
+      </div>
+      <button class="btn block" id="authBtn">Se connecter</button>
+      <p id="authErr" style="color:var(--red);font-size:14px"></p>
+      <button type="button" class="btn ghost block" id="demoBtn">Continuer en mode démo</button>
+    </form>
+  </div>
+</section>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <header><div class="hwrap">
+    <div class="logo hide-s" style="font-size:22px">Meal<span>y</span></div>
+    <div class="loc" id="locBtn"><span class="dot"></span><div><small>Livrer à · <span id="eta">25–30 min</span></small><b id="locTxt">Choisir une adresse</b></div></div>
+    <button class="cartbtn" id="cartBtn">🛒 <span id="cartTot">0,00 €</span><span class="badge hidden" id="cartN">0</span></button>
+    <button class="avatar" id="avatar" title="Se déconnecter">?</button>
+  </div></header>
+  <main>
+    <div class="hero">
+      <div><p class="muted" id="hello">Ciao 👋</p><h1 id="heroT">Ton menu du jour, calibré pour toi</h1></div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div id="menu"></div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="overlay hidden" id="ov"><div class="modal" id="modal"></div></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const eur=n=>n.toFixed(2).replace('.',',')+' €';
+const LS={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+
+// ---------- DATA ----------
+const KITCHEN={lat:45.4642,lng:9.1900,name:'Mealy Kitchen · Porta Romana'};
+const PLACES=[
+ {n:'Piazza del Duomo, Milano',lat:45.4641,lng:9.1919},{n:'Navigli, Ripa di Porta Ticinese',lat:45.4520,lng:9.1740},
+ {n:'Brera, Via Brera 28',lat:45.4720,lng:9.1880},{n:'Isola, Via Borsieri 12',lat:45.4870,lng:9.1880},
+ {n:'Porta Nuova, Piazza Gae Aulenti',lat:45.4840,lng:9.1900},{n:'CityLife, Piazza Tre Torri',lat:45.4780,lng:9.1560},
+ {n:'Città Studi, Piazza Leonardo da Vinci',lat:45.4780,lng:9.2270},{n:'San Siro, Stadio Meazza',lat:45.4781,lng:9.1240},
+ {n:'Bocconi, Via Sarfatti 25',lat:45.4500,lng:9.1890},{n:'Porta Venezia, Corso Buenos Aires',lat:45.4770,lng:9.2050},
+ {n:'Arena Civica, Parco Sempione',lat:45.4750,lng:9.1770},{n:'Lambrate, Via Ventura',lat:45.4840,lng:9.2400}
+];
+const ING={
+ chicken:{n:'Poulet grillé',p:4,k:165,pr:31},beef:{n:'Bœuf Angus',p:5,k:250,pr:26},salmon:{n:'Saumon',p:5,k:208,pr:22},tuna:{n:'Thon mi-cuit',p:5,k:130,pr:28},
+ tofu:{n:'Tofu mariné',p:3,k:145,pr:15},eggs:{n:'Œufs (x2)',p:2,k:140,pr:12},turkey:{n:'Dinde',p:3.5,k:135,pr:29},shrimp:{n:'Crevettes',p:4.5,k:100,pr:20},
+ rice:{n:'Riz basmati',p:1.5,k:200,pr:4},quinoa:{n:'Quinoa',p:2,k:180,pr:7},sweetp:{n:'Patate douce',p:1.5,k:115,pr:2},pasta:{n:'Pâtes complètes',p:1.5,k:210,pr:8},oats:{n:'Flocons d\'avoine',p:1,k:150,pr:5},
+ avocado:{n:'Avocat',p:2,k:160,pr:2},broccoli:{n:'Brocoli',p:1,k:35,pr:3},spinach:{n:'Épinards',p:1,k:20,pr:3},edamame:{n:'Edamame',p:1.5,k:120,pr:11},
+ feta:{n:'Feta',p:1.5,k:75,pr:4},chickpeas:{n:'Pois chiches',p:1.5,k:130,pr:7},tomato:{n:'Tomates cerises',p:.8,k:15,pr:1},cucumber:{n:'Concombre',p:.5,k:8,pr:0},
+ mango:{n:'Mangue',p:1.5,k:60,pr:1},almonds:{n:'Amandes',p:1.5,k:90,pr:3},banana:{n:'Banane',p:.8,k:90,pr:1},berries:{n:'Fruits rouges',p:1.5,k:40,pr:1},
+ pb:{n:'Beurre de cacahuète',p:1,k:95,pr:4},whey:{n:'Whey vanille',p:2,k:120,pr:24},greek:{n:'Yaourt grec 0%',p:1.5,k:90,pr:15},parm:{n:'Parmigiano 24m',p:1.5,k:80,pr:7},
+ pesto:{n:'Pesto basilic',p:1,k:80,pr:1},sesame:{n:'Sauce soja-sésame',p:.5,k:45,pr:1},tahini:{n:'Tahini citron',p:.8,k:90,pr:3},honey:{n:'Miel',p:.5,k:60,pr:0}
+};
+const MEALS=[
+ {id:'m1',cat:'Bowls',e:'🍗',bg:'#2b3a1f',n:'Power Bowl Poulet',d:'Poulet grillé, riz basmati, brocoli, avocat, sauce soja-sésame.',base:11.9,ing:['chicken','rice','broccoli','avocado','sesame'],ext:['eggs','quinoa','edamame','spinach'],goal:['bulk','maint']},
+ {id:'m2',cat:'Bowls',e:'🐟',bg:'#1f2f3a',n:'Poke Saumon Recovery',d:'Saumon, riz, edamame, mangue, concombre, sésame.',base:13.5,ing:['salmon','rice','edamame','mango','cucumber','sesame'],ext:['avocado','tuna','quinoa'],goal:['perf','maint']},
+ {id:'m3',cat:'Bowls',e:'🥩',bg:'#3a1f1f',n:'Mass Gainer Beef',d:'Bœuf Angus, patate douce, épinards, œufs, avocat.',base:14.9,ing:['beef','sweetp','spinach','eggs','avocado'],ext:['rice','parm','chicken'],goal:['bulk']},
+ {id:'m4',cat:'Salades',e:'🥗',bg:'#1f3a26',n:'Shred Salad Dinde',d:'Dinde, épinards, tomates cerises, concombre, pois chiches, tahini.',base:10.9,ing:['turkey','spinach','tomato','cucumber','chickpeas','tahini'],ext:['feta','eggs','avocado'],goal:['cut']},
+ {id:'m5',cat:'Salades',e:'🍤',bg:'#3a2f1f',n:'Crevettes & Quinoa',d:'Crevettes, quinoa, avocat, tomates, concombre.',base:12.5,ing:['shrimp','quinoa','avocado','tomato','cucumber'],ext:['feta','spinach','mango'],goal:['cut','perf']},
+ {id:'m6',cat:'Pasta',e:'🍝',bg:'#3a331f',n:'Pasta Pre-Match',d:'Pâtes complètes, poulet, pesto, parmigiano 24 mois, tomates.',base:11.5,ing:['pasta','chicken','pesto','parm','tomato'],ext:['spinach','broccoli','shrimp'],goal:['perf','bulk']},
+ {id:'m7',cat:'Vegan',e:'🌱',bg:'#243a1f',n:'Green Tofu Bowl',d:'Tofu mariné, quinoa, edamame, brocoli, tahini.',base:10.5,ing:['tofu','quinoa','edamame','broccoli','tahini'],ext:['avocado','chickpeas','almonds','spinach'],goal:['cut','maint','perf']},
+ {id:'m8',cat:'Breakfast',e:'🥣',bg:'#33243a',n:'Overnight Oats Protéiné',d:'Avoine, whey, yaourt grec, fruits rouges, amandes, miel.',base:7.9,ing:['oats','whey','greek','berries','almonds','honey'],ext:['banana','pb'],goal:['bulk','perf','maint']},
+ {id:'m9',cat:'Breakfast',e:'🍳',bg:'#3a3a1f',n:'Egg Muffin Box',d:'Œufs, épinards, dinde, patate douce, avocat.',base:8.9,ing:['eggs','spinach','turkey','sweetp','avocado'],ext:['feta','tomato'],goal:['cut','maint']},
+ {id:'m10',cat:'Bowls',e:'🐠',bg:'#1f333a',n:'Tuna Lean Bowl',d:'Thon mi-cuit, quinoa, concombre, edamame, sésame.',base:12.9,ing:['tuna','quinoa','cucumber','edamame','sesame'],ext:['avocado','mango','spinach'],goal:['cut','perf']}
+];
+const DRINKS=[
+ {id:'d1',e:'🥤',n:'Shake Whey Chocolat',d:'30g protéines · 500ml',p:5.5,k:220,pr:30},{id:'d2',e:'🍓',n:'Smoothie Recovery',d:'Fraise, banane, yaourt grec',p:4.9,k:190,pr:12},
+ {id:'d3',e:'🥬',n:'Green Detox',d:'Épinard, pomme, gingembre, citron',p:4.5,k:90,pr:2},{id:'d4',e:'🥥',n:'Eau de coco',d:'Électrolytes naturels · 330ml',p:3.2,k:60,pr:0},
+ {id:'d5',e:'⚡',n:'Isotonique Citron',d:'Sodium + glucides · 500ml',p:2.9,k:120,pr:0},{id:'d6',e:'☕',n:'Cold Brew Protéiné',d:'Café + 20g whey',p:4.2,k:130,pr:20},
+ {id:'d7',e:'💧',n:'Eau San Pellegrino',d:'500ml',p:1.8,k:0,pr:0},{id:'d8',e:'🍊',n:'Jus Orange Pressé',d:'Sicile · 330ml',p:3.9,k:140,pr:2}
+];
+const GOALS={bulk:'Prise de masse',cut:'Sèche',perf:'Performance',maint:'Maintien'};
+
+// ---------- STATE ----------
+let users=LS.get('mealy_users',{}),me=null,cart=[],cat='Pour toi',loc=null,orders=[];
+function save(){if(!me)return;users[me.email]={...me,cart,loc,orders};LS.set('mealy_users',users);LS.set('mealy_session',me.email)}
+
+// ---------- AUTH ----------
+let mode='login';
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+ mode=b.dataset.t;document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+ $('#aName').classList.toggle('hidden',mode==='login');$('#signupExtra').classList.toggle('hidden',mode==='login');
+ $('#authBtn').textContent=mode==='login'?'Se connecter':'Créer mon compte';$('#authErr').textContent='';
+});
+$('#authForm').onsubmit=e=>{
+ e.preventDefault();const em=$('#aEmail').value.trim().toLowerCase(),pw=$('#aPass').value;
+ if(mode==='login'){const u=users[em];if(!u||u.pass!==pw)return $('#authErr').textContent='Email ou mot de passe incorrect.';login(u)}
+ else{if(users[em])return $('#authErr').textContent='Compte déjà existant.';
+  const u={email:em,pass:pw,name:$('#aName').value.trim()||'Athlète',sport:$('#aSport').value,goal:$('#aGoal').value,weight:+$('#aWeight').value||75,kcal:+$('#aKcal').value||2600};
+  users[em]=u;login(u)}
+};
+$('#demoBtn').onclick=()=>login(users['demo@mealy.it']||{email:'demo@mealy.it',pass:'demo',name:'Marco',sport:'Football',goal:'perf',weight:78,kcal:2900});
+function login(u){me=u;cart=u.cart||[];loc=u.loc||null;orders=u.orders||[];save();$('#auth').classList.add('hidden');$('#app').classList.remove('hidden');render();if(!loc)openLoc()}
+$('#avatar').onclick=()=>{if(confirm('Se déconnecter ?')){localStorage.removeItem('mealy_session');location.reload()}};
+
+// ---------- LOCATION ----------
+function dist(a,b){const R=6371,t=x=>x*Math.PI/180,dl=t(b.lat-a.lat),dg=t(b.lng-a.lng);const h=Math.sin(dl/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dg/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function eta(){if(!loc)return[25,30];const d=dist(KITCHEN,loc),busy=new Date().getHours()%12>6?4:0;const m=Math.round(12+d*4+busy);return[m,m+5]}
+function fee(){if(!loc)return 1.99;const d=dist(KITCHEN,loc);return d<2?0.99:d<5?1.99:2.99}
+function openLoc(){
+ modal(`<div class="mbody"><div class="row"><h2 style="margin:0">📍 Adresse de livraison</h2><button class="tog" onclick="closeM()">✕</button></div>
+ <button class="btn block" id="geo">📡 Utiliser ma position actuelle</button>
+ <input id="locQ" placeholder="Rechercher une adresse à Milan…" autocomplete="off">
+ <div class="sugg" id="sugg"></div><p class="muted" style="font-size:13px">Zone de livraison : Milano città · Cuisine : ${KITCHEN.name}</p></div>`);
+ const draw=q=>{$('#sugg').innerHTML=PLACES.filter(p=>p.n.toLowerCase().includes(q.toLowerCase())).map((p,i)=>`<button data-i="${PLACES.indexOf(p)}">📍 ${p.n} <small class="muted">· ${dist(KITCHEN,p).toFixed(1)} km</small></button>`).join('')+(q.length>3?`<button data-custom="1">➕ Utiliser « ${q.replace(/</g,'')} »</button>`:'');
+  $('#sugg').querySelectorAll('button').forEach(b=>b.onclick=()=>{setLoc(b.dataset.custom?{n:q+', Milano',lat:45.46+Math.random()*.03,lng:9.17+Math.random()*.04}:PLACES[b.dataset.i])})};
+ draw('');$('#locQ').oninput=e=>draw(e.target.value);
+ $('#geo').onclick=()=>{$('#geo').textContent='Localisation…';navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>{
+  const c={lat:p.coords.latitude,lng:p.coords.longitude},inMilan=dist(KITCHEN,c)<15;
+  setLoc(inMilan?{n:`Ma position (${c.lat.toFixed(4)}, ${c.lng.toFixed(4)})`,...c}:{...PLACES[0],n:'Hors zone → Piazza del Duomo, Milano'});
+ },()=>{$('#geo').textContent='📡 Position refusée — choisis ci-dessous'}):null};
+}
+function setLoc(p){loc=p;save();closeM();render();toast('Adresse mise à jour · '+eta()[0]+' min')}
+$('#locBtn').onclick=openLoc;
+
+// ---------- RENDER ----------
+function mealStats(m,cfg){const ids=cfg?cfg.ing:m.ing;let k=0,pr=0;ids.forEach(i=>{k+=ING[i].k;pr+=ING[i].pr});return{k,pr}}
+function mealPrice(m,cfg){const extra=cfg?cfg.ing.filter(i=>!m.ing.includes(i)).reduce((s,i)=>s+ING[i].p,0):0;return m.base+extra}
+function render(){
+ $('#avatar').textContent=me.name[0].toUpperCase();$('#hello').textContent=`Ciao ${me.name} 👋 · ${me.sport}`;
+ $('#locTxt').textContent=loc?loc.n:'Choisir une adresse';const [a,b]=eta();$('#eta').textContent=`${a}–${b} min`;
+ const eaten=cart.reduce((s,c)=>s+c.k*c.q,0),prot=cart.reduce((s,c)=>s+c.pr*c.q,0);
+ $('#stats').innerHTML=`<div class="stat"><small>Objectif</small><b>${GOALS[me.goal]}</b></div><div class="stat"><small>Panier kcal</small><b>${eaten} / ${me.kcal}</b></div><div class="stat"><small>Protéines panier</small><b>${prot} g <span class="muted" style="font-size:12px">/ ${Math.round(me.weight*2)} g</span></b></div>`;
+ const cats=['Pour toi','Bowls','Salades','Pasta','Vegan','Breakfast','Boissons'];
+ $('#chips').innerHTML=cats.map(c=>`<button class="chip ${c===cat?'on':''}">${c}</button>`).join('');
+ $('#chips').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{cat=b.textContent;render()});
+ let html='';
+ const mealCard=m=>{const s=mealStats(m);return`<div class="card" onclick="openMeal('${m.id}')"><div class="img" style="background:${m.bg}">${m.e}</div><div class="body"><div class="tags">${m.goal.includes(me.goal)?'<span class="tag g">✓ Adapté à ton objectif</span>':''}<span class="tag">${m.cat}</span></div><h3>${m.n}</h3><p class="muted" style="font-size:13px">${m.d}</p><div class="row" style="margin-top:auto"><div class="macros"><span><b>${s.k}</b> kcal</span><span><b>${s.pr}g</b> prot</span></div><span class="price">${eur(m.base)}</span></div></div></div>`};
+ const drinkCard=d=>`<div class="card" onclick="addDrink('${d.id}')"><div class="img" style="background:#1f2a33;height:100px;font-size:48px">${d.e}</div><div class="body"><h3>${d.n}</h3><p class="muted" style="font-size:13px">${d.d}</p><div class="row" style="margin-top:auto"><div class="macros"><span><b>${d.k}</b> kcal</span><span><b>${d.pr}g</b> prot</span></div><span class="price">${eur(d.p)} <span class="tog add" style="display:inline-grid;place-items:center;margin-left:6px">+</span></span></div></div></div>`;
+ if(cat==='Pour toi'){
+  const rec=MEALS.filter(m=>m.goal.includes(me.goal));
+  html+=`<h2>🎯 Recommandés pour ta ${GOALS[me.goal].toLowerCase()}</h2><div class="grid">${rec.map(mealCard).join('')}</div>`;
+  html+=`<h2>🍽️ Tous les repas</h2><div class="grid">${MEALS.filter(m=>!rec.includes(m)).map(mealCard).join('')}</div>`;
+  html+=`<h2>🥤 Boissons</h2><div class="grid">${DRINKS.map(drinkCard).join('')}</div>`;
+ }else if(cat==='Boissons')html+=`<h2>🥤 Boissons</h2><div class="grid">${DRINKS.map(drinkCard).join('')}</div>`;
+ else html+=`<h2>${cat}</h2><div class="grid">${MEALS.filter(m=>m.cat===cat).map(mealCard).join('')}</div>`;
+ if(orders.length)html+=`<h2>🧾 Mes commandes</h2><div class="grid">${orders.slice().reverse().map(o=>`<div class="card" onclick="track('${o.id}')"><div class="body"><div class="row"><b>#${o.id}</b><span class="tag ${Date.now()<o.arrive?'g':''}">${Date.now()<o.arrive?'En cours':'Livrée'}</span></div><small class="muted">${new Date(o.at).toLocaleString('fr-FR')} · ${o.items.length} article(s)</small><div class="row"><span class="muted" style="font-size:13px">${o.addr}</span><b>${eur(o.total)}</b></div></div></div>`).join('')}</div>`;
+ $('#menu').innerHTML=html;
+ const n=cart.reduce((s,c)=>s+c.q,0),t=cart.reduce((s,c)=>s+c.p*c.q,0);
+ $('#cartTot').textContent=eur(t);$('#cartN').textContent=n;$('#cartN').classList.toggle('hidden',!n);
+}
+
+// ---------- MEAL CUSTOMIZER ----------
+let cfg;
+function openMeal(id){const m=MEALS.find(x=>x.id===id);cfg={id,ing:[...m.ing],q:1,note:''};drawMeal()}
+function drawMeal(){
+ const m=MEALS.find(x=>x.id===cfg.id),s=mealStats(m,cfg),p=mealPrice(m,cfg);
+ const all=[...m.ing,...m.ext];
+ modal(`<div class="img" style="background:${m.bg}">${m.e}<button class="close" onclick="closeM()">✕</button></div>
+ <div class="mbody"><div><h2 style="margin:0">${m.n}</h2><p class="muted">${m.d}</p></div>
+ <div class="kv"><div class="stat" style="background:var(--card2)"><small>Calories</small><b>${s.k} kcal</b></div><div class="stat" style="background:var(--card2)"><small>Protéines</small><b>${s.pr} g</b></div></div>
+ <div><b>Ingrédients</b> <small class="muted">· retire ou ajoute ce que tu veux</small></div>
+ ${all.map(i=>{const on=cfg.ing.includes(i),base=m.ing.includes(i);return`<div class="ing ${on?'':'off'}"><div><span class="n">${ING[i].n}</span><br><small>${ING[i].k} kcal · ${ING[i].pr}g prot${base?'':' · +'+eur(ING[i].p)}</small></div><button class="tog ${on?'':'add'}" onclick="togI('${i}')">${on?'−':'+'}</button></div>`}).join('')}
+ <input placeholder="Note pour la cuisine (ex : sauce à part)" value="${cfg.note}" oninput="cfg.note=this.value">
+ </div>
+ <div class="sticky"><div class="qty"><button onclick="cfg.q=Math.max(1,cfg.q-1);drawMeal()">−</button><b>${cfg.q}</b><button onclick="cfg.q++;drawMeal()">+</button></div>
+ <button class="btn" style="flex:1" onclick="addMeal()">Ajouter · ${eur(p*cfg.q)}</button></div>`);
+}
+function togI(i){cfg.ing=cfg.ing.includes(i)?cfg.ing.filter(x=>x!==i):[...cfg.ing,i];const sc=$('#modal').scrollTop;drawMeal();$('#modal').scrollTop=sc}
+function addMeal(){
+ const m=MEALS.find(x=>x.id===cfg.id);if(!cfg.ing.length)return toast('Ajoute au moins un ingrédient');
+ const s=mealStats(m,cfg),rem=m.ing.filter(i=>!cfg.ing.includes(i)).map(i=>ING[i].n),add=cfg.ing.filter(i=>!m.ing.includes(i)).map(i=>ING[i].n);
+ cart.push({key:Date.now()+'',n:m.n,e:m.e,p:mealPrice(m,cfg),q:cfg.q,k:s.k,pr:s.pr,mods:[...add.map(x=>'+ '+x),...rem.map(x=>'sans '+x)].join(', '),note:cfg.note});
+ save();closeM();render();toast(`${m.n} ajouté au panier ✓`)
+}
+function addDrink(id){const d=DRINKS.find(x=>x.id===id),ex=cart.find(c=>c.did===id);ex?ex.q++:cart.push({key:Date.now()+'',did:id,n:d.n,e:d.e,p:d.p,q:1,k:d.k,pr:d.pr,mods:''});save();render();toast(`${d.n} ajouté ✓`)}
+
+// ---------- CART / CHECKOUT ----------
+let pay='card',tip=1;
+function openCart(){const d=$('#drawer');d.classList.add('open');drawCart()}
+function drawCart(){
+ const sub=cart.reduce((s,c)=>s+c.p*c.q,0),f=fee(),svc=sub*.05,tot=sub+(cart.length?f+svc+tip:0);const [a,b]=eta();
+ $('#drawer').innerHTML=`<div class="dhead"><h2 style="margin:0">Ton panier</h2><button class="tog" onclick="closeCart()">✕</button></div>
+ <div class="dbody">${cart.length?cart.map(c=>`<div class="citem"><div class="row"><b>${c.e} ${c.n}</b><b>${eur(c.p*c.q)}</b></div>${c.mods?`<small>${c.mods}</small>`:''}${c.note?`<small>📝 ${c.note}</small>`:''}<div class="row"><small>${c.k*c.q} kcal · ${c.pr*c.q}g prot</small><div class="qty" style="padding:3px"><button onclick="chq('${c.key}',-1)">${c.q>1?'−':'🗑'}</button><b>${c.q}</b><button onclick="chq('${c.key}',1)">+</button></div></div></div>`).join(''):'<p class="muted" style="text-align:center;padding:40px 0">Ton panier est vide 🥗</p>'}
+ ${cart.length?`<div class="citem"><div class="row"><b>📍 ${loc?loc.n:'Aucune adresse'}</b><button class="tag g" onclick="closeCart();openLoc()">Modifier</button></div><small>⏱️ Livraison estimée : ${a}–${b} min · arrivée vers ${new Date(Date.now()+b*60000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</small></div>
+ <b>Pourboire livreur</b><div class="pay" style="grid-template-columns:repeat(4,1fr)">${[0,1,2,3].map(t=>`<button class="payopt ${tip===t?'on':''}" onclick="tip=${t};drawCart()">${t?t+' €':'Non'}</button>`).join('')}</div>
+ <b>Paiement</b><div class="pay">${[['card','💳 Carte'],['apple',' Apple Pay'],['gpay','G Pay'],['satispay','🟥 Satispay']].map(([k,l])=>`<button class="payopt ${pay===k?'on':''}" onclick="pay='${k}';drawCart()">${l}</button>`).join('')}</div>
+ ${pay==='card'?`<input id="cc" placeholder="Numéro de carte" inputmode="numeric" maxlength="19" value="4242 4242 4242 4242"><div class="kv"><input placeholder="MM/AA" value="12/28"><input placeholder="CVC" value="123"></div>`:''}`:''}
+ </div>
+ ${cart.length?`<div class="dfoot"><div class="sum"><span>Sous-total</span><span>${eur(sub)}</span></div><div class="sum"><span>Livraison</span><span>${eur(f)}</span></div><div class="sum"><span>Frais de service</span><span>${eur(svc)}</span></div>${tip?`<div class="sum"><span>Pourboire</span><span>${eur(tip)}</span></div>`:''}<div class="sum t"><span>Total</span><span>${eur(tot)}</span></div>
+ <button class="btn block" id="payBtn" onclick="checkout(${tot})">Payer ${eur(tot)}</button></div>`:''}`;
+}
+function chq(k,d){const c=cart.find(x=>x.key===k);c.q+=d;if(c.q<1)cart=cart.filter(x=>x!==c);save();render();drawCart()}
+function closeCart(){$('#drawer').classList.remove('open')}
+$('#cartBtn').onclick=openCart;
+function checkout(tot){
+ if(!loc){closeCart();return openLoc()}
+ const b=$('#payBtn');b.textContent='Paiement en cours…';b.disabled=true;
+ setTimeout(()=>{const [,mx]=eta();const o={id:Math.random().toString(36).slice(2,7).toUpperCase(),at:Date.now(),arrive:Date.now()+mx*60000,dur:mx,items:cart,total:tot,addr:loc.n,pay};
+  orders.push(o);cart=[];save();closeCart();render();track(o.id)},1200);
+}
+
+// ---------- TRACKING ----------
+let trackT;
+function track(id){
+ const o=orders.find(x=>x.id===id);clearInterval(trackT);
+ const draw=()=>{const tot=o.arrive-o.at,el=Math.min(1,(Date.now()-o.at)/tot),left=Math.max(0,Math.ceil((o.arrive-Date.now())/60000));
+  const st=[['Commande confirmée',0],['En préparation en cuisine 👨‍🍳',.05],['Livreur en route 🛵',.45],['Livré ! Bon appétit 💪',1]];
+  const cur=st.reduce((a,s,i)=>el>=s[1]?i:a,0);
+  modal(`<div class="mbody"><div class="row"><h2 style="margin:0">Commande #${o.id}</h2><button class="tog" onclick="closeM()">✕</button></div>
+  <div style="text-align:center;padding:10px 0"><div style="font-size:54px">${cur<2?'👨‍🍳':cur<3?'🛵':'✅'}</div><h1 style="font-size:34px">${left?left+' min':'Livré'}</h1><p class="muted">${left?'Arrivée prévue à '+new Date(o.arrive).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'Merci pour ta commande !'}</p></div>
+  <div class="bar"><i style="width:${el*100}%"></i></div>
+  <div class="steps">${st.map((s,i)=>`<div class="step ${i<cur||el>=1?'done':i===cur?'now done':''}"><span class="c">${i<=cur?'✓':i+1}</span>${s[0]}</div>`).join('')}</div>
+  <div class="citem"><small>📍 ${o.addr}</small><small>🍽️ ${o.items.map(i=>i.q+'× '+i.n).join(', ')}</small><div class="row"><small>Payé via ${o.pay}</small><b>${eur(o.total)}</b></div></div></div>`)};
+ draw();trackT=setInterval(()=>{if($('#ov').classList.contains('hidden'))return clearInterval(trackT);draw()},5000);
+}
+
+// ---------- UI UTILS ----------
+function modal(h){$('#modal').innerHTML=h;$('#ov').classList.remove('hidden')}
+function closeM(){$('#ov').classList.add('hidden');clearInterval(trackT)}
+$('#ov').onclick=e=>{if(e.target.id==='ov')closeM()};
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(tt);tt=setTimeout(()=>t.classList.add('hidden'),2000)}
+
+// restore session
+const s=LS.get('mealy_session',null);if(s&&users[s])login(users[s]);
+</script>
+</body>
+</html>
